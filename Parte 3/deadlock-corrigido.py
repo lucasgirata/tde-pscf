@@ -4,22 +4,19 @@ import time
 lockA = threading.Lock()
 lockB = threading.Lock()
 
-def log(mensagem):
-    print(f"[{threading.current_thread().name}] {mensagem}", flush=True)
-
-def task(nome):
+def tarefa(nome):
     with lockA:
-        log("Obteve Lock A")
+        print(nome, "obteve A")
         time.sleep(0.05)
         with lockB:
-            log("Obteve Lock B")
-            print(f"{nome} terminou", flush=True)
+            print(nome, "obteve B")
+            print(nome, "concluiu")
 
-if __name__ == "__main__":
-    thread1 = threading.Thread(target=task, args=("T1",), name="T1")
-    thread2 = threading.Thread(target=task, args=("T1",), name="T2")
+thread1 = threading.Thread(target=tarefa, args=("Thread 1",))
+thread2 = threading.Thread(target=tarefa, args=("Thread 2",))
 
-    thread1.start(); thread2.start()
-    thread1.join(); thread2.join()
-
-    print("O programa finalizou")
+thread1.start()
+thread2.start()
+thread1.join()
+thread2.join()
+print("Programa finalizado")

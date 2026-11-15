@@ -93,3 +93,36 @@ Em Java existe o conceito de happens-before: o que uma thread escreve antes do `
 No Python, o GIL acaba funcionando como uma barreira implicita, porque ele e liberado e pego de novo em toda troca de thread, entao as threads sempre veem o valor mais recente na memoria. O problema no Python entao nao e visibilidade e sim atomicidade (a sequencia ler-somar-escrever ser interrompida no meio). O acquire/release do semaforo tambem servem como ponto de sincronizacao. Mas o GIL sozinho nao resolve a corrida, ele so garante que um bytecode roda por vez, e o `contador = contador + 1` tem varios bytecodes.
 
 ## Parte 3 - Deadlock
+
+### Logs do código com travamento
+
+```
+Thread 1 pegou A
+Thread 2 pegou B
+Thread 1 tenta B
+Thread 2 tenta A
+Deadlock: Threads nao finalizaram
+[<_MainThread(MainThread, started 18236)>, <Thread(Thread-1 (thread1), started daemon 17568)>, <Thread(Thread-2 (thread2), started daemon 19572)>]
+
+[Done] exited with code=0 in 4.341 seconds
+```
+
+### Logs do código corrigido
+
+```
+Thread 1 obteve A
+Thread 1 obteve B
+Thread 1 concluiu
+Thread 2 obteve A
+Thread 2 obteve B
+Thread 2 concluiu
+Programa finalizado
+
+[Done] exited with code=0 in 0.42 seconds
+```
+
+### Explicação das condições de Coffman
+
+Para que o deadlock aconteça, quatro das condições de Coffman foram manifestadas, sendo elas:
+
+1. \*\*

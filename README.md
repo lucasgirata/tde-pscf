@@ -9,6 +9,75 @@
 Link do vídeo no Youtube:
 
 ## Parte 1 - Jantar dos Filosofos
+Código: `Parte1/filosofos.py`.
+
+```
+cd Parte1
+python filosofos.py naive
+python filosofos.py correto
+```
+
+O programa roda 8 segundos e imprime no console o estado de cada um dos 5 filósofos (*pensando*, *com fome* e *comendo*). No final, mostra se houve deadlock e quantas refeições cada filósofo fez.
+
+### Dinâmica do problema
+Cinco filósofos (threads) sentam numa mesa circular; entre cada par há um garfo (um `Lock`, total de 5).
+Cada um alterna pensar → ficar com fome → comer, e para comer precisa dos dois garfos adjacentes,
+compartilhados com os vizinhos (exclusão mútua). O filósofo `i` usa os garfos `i` e `(i+1) % 5`.
+
+### Por que o impasse surge (versão ingênua)
+Todos pegam primeiro o garfo da esquerda e depois o da direita. Se os cinco pegam o da esquerda
+"ao mesmo tempo", cada um segura um garfo e espera o do vizinho, que também está segurado: ninguém
+progride. Na execução ingênua, depois de 8 segundos todos continuam "com fome" e o programa imprime
+`DEADLOCK`, com 0 refeições. Para o impasse aparecer sempre, o código tem uma pausa de 0,5 s entre
+pegar o primeiro e o segundo garfo (sem ela, uma thread costuma pegar os dois garfos antes das outras
+acordarem e o deadlock quase não acontece). Estão presentes as 4 condições de Coffman:
+
+1. **Exclusão mútua** – um garfo só serve a um filósofo.
+2. **Manter-e-esperar** – segura o garfo esquerdo enquanto espera o direito.
+3. **Não preempção** – ninguém tira o garfo de outro.
+4. **Espera circular** – F0→F1→F2→F3→F4→F0.
+
+### Solução: hierarquia de recursos
+Cada garfo tem índice único (0..4); **todo filósofo pega primeiro o garfo de menor índice e depois o
+de maior**. Apenas o filósofo 4 (garfos 4 e 0) inverte a ordem em relação à versão ingênua: ele pega
+o garfo 0 primeiro.
+
+**Condição de Coffman negada: espera circular.** Como todos adquirem recursos em ordem crescente,
+um ciclo de espera exigiria algum filósofo esperar por um garfo de índice menor que o que já possui,
+o que o protocolo proíbe; logo não há ciclo e o impasse é impossível. As outras três condições
+continuam valendo (os garfos seguem exclusivos).
+
+### Progresso e justiça (ausência de inanição)
+- **Progresso:** sem deadlock, sempre existe algum filósofo que consegue os dois garfos, e ele os
+  libera ao terminar de comer, permitindo que outro avance.
+- **Justiça:** o tempo de comer é finito e os garfos são liberados ao fim de cada refeição; os
+  `Lock`s do Python não garantem ordem FIFO, mas como as refeições são curtas e os tempos de
+  pensar são aleatórios, nenhum filósofo fica bloqueado indefinidamente. Na execução, todos comeram
+  várias vezes (por exemplo `[4, 7, 7, 7, 4]` em 8 s; os valores variam a cada execução). Os filósofos
+  0 e 4 tendem a comer um pouco menos porque disputam o garfo 0, mas ninguém fica com zero.
+  Para uma garantia formal, bastaria usar um semáforo justo ou uma fila FIFO.
+
+### Pseudocódigo
+
+```
+Dados: N = 5; garfos 0..N-1; o filósofo i usa os garfos i e (i+1) mod N
+
+Para cada filósofo i:
+  esq = i ;  dir = (i+1) mod N
+  primeiro = min(esq, dir) ;  segundo = max(esq, dir)
+
+  Loop:
+    pensar()
+    estado[i] <- "com fome"
+    adquirir(primeiro)      // bloqueia até o garfo estar livre
+    adquirir(segundo)
+    estado[i] <- "comendo"
+    comer()
+    liberar(segundo)
+    liberar(primeiro)
+    estado[i] <- "pensando"
+```
+Ordem de aquisição: sempre crescente; liberação: ordem inversa.
 
 ## Parte 2 - Threads e Semaforos
 

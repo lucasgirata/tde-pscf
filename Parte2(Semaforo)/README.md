@@ -62,7 +62,7 @@ Ai tudo que as outras fizeram nesse tempo se perde. Por isso o resultado muda a 
 
 O semaforo foi criado com 1 permissao, entao ele funciona como um lock. Quando uma thread faz `acquire()`, as outras que tentarem tambem ficam bloqueadas ate ela fazer o `release()`. Assim so uma thread por vez faz o ler-somar-escrever, e nenhum incremento e sobrescrito. Por isso sempre da 1.600.000.
 
-**Throughput (por que ficou mais lento)**
+**Por que ficou mais lento**
 
 - cada incremento agora tem um acquire e um release, sao 1.600.000 de cada
 - so uma thread trabalha por vez na secao critica, as outras ficam esperando
@@ -70,7 +70,7 @@ O semaforo foi criado com 1 permissao, entao ele funciona como um lock. Quando u
 
 Ou seja, ganha correcao mas perde desempenho. Mesmo assim nao adianta a versao sem semaforo ser mais rapida se o resultado esta errado. Uma forma de melhorar seria cada thread somar numa variavel local e so no final atualizar o contador global com o semaforo, ai seriam so 8 acquires em vez de 1.600.000.
 
-**Justica (fairness)**
+**Justica**
 
 Em Java da pra criar um semaforo justo com `new Semaphore(1, true)`, que atende as threads na ordem que chegaram. O `threading.Semaphore` do Python nao garante essa ordem, a thread que acabou de liberar pode pegar de novo antes de uma que ja estava esperando. Isso deixa mais rapido mas pode fazer uma thread andar mais que outra por um tempo. No nosso caso isso nao muda o resultado, porque todas terminam os seus 200.000 incrementos no final.
 

@@ -93,3 +93,47 @@ Em Java existe o conceito de happens-before: o que uma thread escreve antes do `
 No Python, o GIL acaba funcionando como uma barreira implicita, porque ele e liberado e pego de novo em toda troca de thread, entao as threads sempre veem o valor mais recente na memoria. O problema no Python entao nao e visibilidade e sim atomicidade (a sequencia ler-somar-escrever ser interrompida no meio). O acquire/release do semaforo tambem servem como ponto de sincronizacao. Mas o GIL sozinho nao resolve a corrida, ele so garante que um bytecode roda por vez, e o `contador = contador + 1` tem varios bytecodes.
 
 ## Parte 3 - Deadlock
+
+### Logs do código com travamento
+
+```
+Thread 1 pegou A
+Thread 2 pegou B
+Thread 1 tenta B
+Thread 2 tenta A
+Deadlock: Threads nao finalizaram
+[<_MainThread(MainThread, started 18236)>, <Thread(Thread-1 (thread1), started daemon 17568)>, <Thread(Thread-2 (thread2), started daemon 19572)>]
+
+[Done] exited with code=0 in 4.341 seconds
+```
+
+### Logs do código corrigido
+
+```
+Thread 1 obteve A
+Thread 1 obteve B
+Thread 1 concluiu
+Thread 2 obteve A
+Thread 2 obteve B
+Thread 2 concluiu
+Programa finalizado
+
+[Done] exited with code=0 in 0.42 seconds
+```
+
+### Explicação das condições de Coffman
+
+Para que o deadlock aconteça, quatro das condições de Coffman foram manifestadas, sendo elas:
+
+1. **Exclusão Mútua**: Uma thread por vez segura threading.Lock(). Com a thread 1 segurando A, a thread 2 não consegue entrar na seção crítica e vice-versa com B.
+2. **Manter-e-esperar**: A thread 1 segura A e pede B simultaneamente. A thread 2 faz o inverso (Segura B e solicita A).
+3. **Não preempção**: As threads não tomam um lock da outra. Ele só é liberado quando sai do bloco de código do with, ou seja, nunca acontecendo, já que o dono se bloqueia esperando o outro lock.
+4. **Espera circular**: A thread 1 aguarda o recurso da thread 2 e vice-versa, formando o ciclo: Thread 1 -> Lock B -> Thread 2 -> Lock A -> Thread 1
+
+Para a correção do código, se altera a execução das duas threads, com ambas executando "tarefa". Nessa execução, sempre se adquire o Lock A antes do Lock B. Se aplica a hierarquia de recursos, onde A tem prioridade sobre B em ambas as threads.
+
+### Condição de Coffman quebrada
+
+Com a ordem aplicada no código, se quebra a condição **espera circular** de Coffman, já que a Thread 2 tenta obter o Lock A antes de qualquer outro. Caso a Thread 1 já esteja com A, a Thread 2 aguarda sem segurar nenhum dos dois locks, sem existir dependências e ciclos. Ou seja, nunca existe uma thread que segura B enquanto espera A ser liberado. 
+
+Porém as condições restantes ainda são válidas, já que os locks ainda continuam exclusivos, as threads seguram um lock e pedem outro simultaneamente e não existe a preempção. Porém, o deadlock não é possível sem a espera circular. 

@@ -16,7 +16,7 @@ Nessa parte a ideia foi mostrar uma condicao de corrida com um contador comparti
 
 Linguagem: Python (testado no 3.10+)
 
-## Como rodar
+### Como rodar
 
 ```
 cd parte2-semaforo
@@ -32,7 +32,7 @@ python3 contador.py com
 
 Os valores de T (threads), M (incrementos) e quantas execucoes estao no comeco do arquivo, da pra mudar la.
 
-## O que o codigo faz
+### O que o codigo faz
 
 Tem uma variavel global `contador` e 8 threads, cada uma soma 1 nela 200.000 vezes. Entao o valor final certo seria 8 x 200.000 = 1.600.000.
 
@@ -41,7 +41,7 @@ Tem uma variavel global `contador` e 8 threads, cada uma soma 1 nela 200.000 vez
 
 Uma coisa que tivemos que fazer: no primeiro teste, a versao sem semaforo dava o valor certo quase sempre. Isso acontece por causa do GIL do Python, as threads terminavam tao rapido que quase nao tinha troca de thread no meio da conta. Por isso colocamos a funcao `incrementa()`, que faz um loop que nao muda o valor, so pra deixar a operacao um pouco mais demorada (o proprio enunciado fala pra fazer isso). Usamos ela nas duas versoes pra comparacao de tempo ser justa.
 
-## Resultados
+### Resultados
 
 T = 8, M = 200.000, esperado = 1.600.000
 
@@ -58,7 +58,7 @@ Saida completa no arquivo `resultados.txt`.
 
 Sem semaforo o valor muda toda vez e fica bem longe do esperado (perdeu mais de 1 milhao de incrementos). Com semaforo deu certo nas 3 vezes, mas ficou mais ou menos 2,5x mais lento.
 
-## Discussao
+### Discussao
 
 **Por que perde incrementos sem sincronizacao**
 

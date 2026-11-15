@@ -5,19 +5,17 @@ import sys
 import threading
 import time
 
-T = 8          # numero de threads
-M = 200000     # incrementos por thread
-EXECUCOES = 3  # quantas vezes roda cada versao
+T = 8          
+M = 200000     
+EXECUCOES = 3  
 
 contador = 0
-semaforo = threading.Semaphore(1)  # 1 permissao = semaforo binario
+semaforo = threading.Semaphore(1)  
 
 
-# faz uma "conta" no meio do incremento pra dar tempo de trocar de thread
-# sem isso o GIL do python quase nao deixa a corrida aparecer
 def incrementa(valor):
     for i in range(20):
-        valor = valor ^ 0  # nao muda nada, so gasta tempo
+        valor = valor ^ 0  
     return valor + 1
 
 
@@ -25,9 +23,9 @@ def incrementa(valor):
 def tarefa_sem_semaforo():
     global contador
     for i in range(M):
-        x = contador          # le
-        x = incrementa(x)     # soma
-        contador = x          # escreve (pode apagar o que outra thread fez)
+        x = contador         
+        x = incrementa(x)    
+        contador = x         
 
 
 # versao 2: com semaforo binario
@@ -54,15 +52,13 @@ def rodar(tarefa):
     for t in threads:
         t.start()
     for t in threads:
-        t.join()  # espera todas acabarem
+        t.join()  
     fim = time.time()
 
     return contador, fim - inicio
 
 
 def main():
-    # da pra escolher a versao: python3 contador.py sem / com
-    # sem argumento roda as duas
     opcao = "ambas"
     if len(sys.argv) > 1:
         opcao = sys.argv[1]

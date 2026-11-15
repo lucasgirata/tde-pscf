@@ -30,5 +30,5 @@ t1.join(timeout=2)
 t2.join(timeout=2)
 
 if t1.is_alive() or t2.is_alive():
-    print("Deadlock: Threads não finalizaram")
+    print("Deadlock: Threads nao finalizaram")
     print(threading.enumerate())

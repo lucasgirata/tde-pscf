@@ -6,7 +6,7 @@
 
 #### Linguagem escolhida: Python
 
-Link do vídeo no Youtube:
+Link do vídeo no Youtube: https://www.youtube.com/watch?v=qGTtQnq0PoQ
 
 ## Parte 1 - Jantar dos Filosofos
 Código: `Parte1/filosofos.py`.

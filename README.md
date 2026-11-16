@@ -166,7 +166,7 @@ No Python, o GIL acaba funcionando como uma barreira implicita, porque ele e lib
 ### Instruções de Execução
 1. Baixar ou ter o Python 3.8 ou superior
 2. Salvar os arquivos `deadlock-travamento.py` e `deadlock-corrigido.py` da pasta "Parte 3" deste repositório em uma pasta de arquivos na máquina local
-3. No terminal da pasta selecionada, rode: `bash python deadlock-travamento.py` ou `bash python deadlock-corrigido.py`. Ou execute em uma IDE da linguagem, como Visual Studio Code ou PyCharm
+3. No terminal da pasta selecionada, rode: `python deadlock-travamento.py` ou `python deadlock-corrigido.py`. Ou execute em uma IDE da linguagem, como Visual Studio Code ou PyCharm
 
 As saídas esperadas são as seguintes:
 
